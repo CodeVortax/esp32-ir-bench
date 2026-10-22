@@ -11,6 +11,11 @@ No authentication. All routes answer CORS preflight.
 | GET | `/remotes` | JSON array of all remotes |
 | POST | `/remotes` | Create or replace a remote (JSON body with an `id`) |
 | DELETE | `/remotes?id=<id>` | Delete a remote |
+| GET | `/setup` | WiFi setup page |
+| GET | `/wifi/status` | `{mode: "sta"\|"ap", ssid, ip, version}` |
+| GET | `/wifi/scan` | JSON array of nearby network names |
+| POST | `/wifi/save` | Form fields `ssid`, `pass`. Saves and restarts. Password is empty or 8 to 63 characters |
+| POST | `/wifi/forget` | Clears the saved WiFi and restarts into hotspot mode |
 
 ```bash
 curl http://192.168.1.50/capture

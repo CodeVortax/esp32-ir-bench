@@ -1,10 +1,20 @@
 #pragma once
 
-#define FW_VERSION               "0.3.0-beta"
+#define FW_VERSION               "0.4.0-beta"
 
-// ---------------- WiFi (your home router) ----------------
-#define WIFI_SSID                "YOUR_WIFI_NAME"
-#define WIFI_PASSWORD            "YOUR_WIFI_PASSWORD"
+// ---------------- WiFi ----------------
+// Optional first-boot defaults. Leave them empty and set WiFi from your
+// phone instead: when the board can't connect it opens its own hotspot.
+#define WIFI_SSID                ""
+#define WIFI_PASSWORD            ""
+#define WIFI_CONNECT_TIMEOUT_MS  15000
+
+// Hotspot the board opens when it has no WiFi (then open http://192.168.4.1)
+#define AP_SSID                  "IR-Bench"
+#define AP_PASSWORD              "irbench123"   // 8 characters or more
+
+// Hold the BOOT button (GPIO0) this long to forget the saved WiFi.
+#define RESET_HOLD_MS            5000
 
 // ---------------- Pins ----------------
 // Bare 3-leg receiver (VCC / GND / OUT): OUT -> IR_RECV_PIN.
