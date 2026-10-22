@@ -29,12 +29,17 @@ An ESP32 that learns infrared codes from a real remote and replays them through 
 
 ## Wiring
 
-| Part | Pin |
-|---|---|
-| IR receiver OUT (3-leg, VCC/GND/OUT) | GPIO 14 |
-| IR LED (anode) | GPIO 4 |
+| Part | Wire it to | Label on the board |
+|---|---|---|
+| IR receiver VCC | 3.3 V | `3V3` |
+| IR receiver GND (middle leg) | Ground | `GND` |
+| IR receiver OUT (signal) | GPIO 4 | `D4` |
+| IR LED long leg (+) | GPIO 14 | `D14` |
+| IR LED short leg (−) | Ground | `GND` |
 
-Change them in [`include/config.h`](include/config.h). A bare LED works for bench testing because bursts are milliseconds long; add a 100 to 150 ohm resistor as soon as you have one.
+- Power the receiver from `3V3`, never `VIN`: `VIN` is 5 V and would put 5 V on the signal pin.
+- Receiver pinouts differ. With the dark window facing you and the legs down, most read VCC, GND, OUT or OUT, GND, VCC from left to right. If capture never works, check the datasheet or swap the two outer legs.
+- Change the pins in [`include/config.h`](include/config.h). A bare LED works for bench testing because bursts are milliseconds long; add a 100 to 150 ohm resistor as soon as you have one.
 
 ## Install
 
