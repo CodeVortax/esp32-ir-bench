@@ -11,8 +11,8 @@
 // Bare 2-leg LED with no resistor: bursts are only milliseconds long, so
 // direct drive is OK for bench testing. Add ~100-150 ohm in series as soon
 // as you have one (your old remote's board usually has one already).
-#define IR_RECV_PIN              14
-#define IR_SEND_PIN              4
+#define IR_RECV_PIN               4
+#define IR_SEND_PIN               14
 
 // ---------------- Web server / capture ----------------
 #define WEB_SERVER_PORT          80
