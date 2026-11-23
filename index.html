@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>IRBench Studio — ESP32 IR Latency & Telemetry Workbench</title>
+    <meta name="description" content="ESP32 infrared signal transmission latency workbench, low-overhead Wi-Fi controller, preset remote deck, and extended consistency analytics." />
+    <meta property="og:title" content="IRBench Studio — ESP32 IR Latency & Telemetry Workbench" />
+    <meta property="og:description" content="Low-overhead ESP32 Wi-Fi IR remote builder, .irx/.ir layouts, real-time RTT telemetry, and CSV/JSON consistency logging." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('irbench-theme');
+          var root = document.documentElement;
+          if (saved === 'light') {
+            root.classList.remove('dark');
+            root.setAttribute('data-theme', 'light');
+          } else {
+            root.classList.add('dark');
+            root.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

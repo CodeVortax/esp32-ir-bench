@@ -1,0 +1,150 @@
+name: Build Firmware, Android App & Auto Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-firmware:
+    name: Build ESP32 Firmware
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio/.cache
+            ~/.platformio/packages
+            ~/.platformio/platforms
+          key: ${{ runner.os }}-pio-${{ hashFiles('firmware/platformio.ini') }}
+
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
+
+      - name: Compile ESP32 & ESP32-S3 Firmware
+        working-directory: firmware
+        run: pio run
+
+      - name: Collect firmware binaries
+        run: |
+          mkdir -p release-firmware
+          cp firmware/.pio/build/esp32dev/firmware.bin release-firmware/irbench-esp32dev.bin
+          cp firmware/.pio/build/esp32-s3-devkitc-1/firmware.bin release-firmware/irbench-esp32s3.bin
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-bins
+          path: release-firmware/*.bin
+
+  build-android:
+    name: Build Kotlin Android APK (API 24-35)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build Debug & Release APKs
+        working-directory: android
+        run: gradle assembleDebug assembleRelease --no-daemon
+
+      - name: Collect APKs
+        run: |
+          mkdir -p release-apk
+          cp android/app/build/outputs/apk/release/app-release.apk release-apk/irbench-android-release.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk release-apk/irbench-android-debug.apk
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: release-apk/*.apk
+
+  build-web:
+    name: Verify Web Dashboard Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install & Build Web Dashboard
+        run: |
+          npm install
+          npm run build
+
+  auto-release:
+    name: Auto GitHub Release
+    needs: [build-firmware, build-android, build-web]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download firmware binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-bins
+          path: dist-release/firmware
+
+      - name: Download Android APKs
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: dist-release/android
+
+      - name: Resolve release tag
+        id: tag
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=v2.4.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          name: IRBench ${{ steps.tag.outputs.name }}
+          generate_release_notes: true
+          make_latest: true
+          files: |
+            dist-release/firmware/*.bin
+            dist-release/android/*.apk

@@ -1,0 +1,6 @@
+{
+  "name": "IRBench Studio",
+  "description": "ESP32 infrared signal transmission latency workbench, low-overhead Wi-Fi controller, preset remote deck, and extended consistency analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
